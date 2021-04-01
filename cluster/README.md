@@ -96,7 +96,6 @@ $ redis-benchmark -t get -c 100000 -n 100000 -h redis-cluster.redis-cluster.svc.
 ### SET
 ```bash
 $ redis-benchmark -t set -c 100000 -n 100000 -h redis-cluster.redis-cluster.svc.cluster.local
-```
 ====== SET ======
   100000 requests completed in 7.02 seconds
   100000 parallel clients
