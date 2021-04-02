@@ -11,7 +11,7 @@ You should scale the cluster up or down manually
 ### Get cluster nodes
 
 ```
-kubectl get pods -l app=redis-cluster -o jsonpath='{range.items[*]}{.status.podIP}:6379 '
+kubectl get pods -l name=redis-cluster -o jsonpath='{range.items[*]}{.status.podIP}:6379 '
 ```
 
 Now we are going to create the cluster ( assign master/slave roles, distribute slot maps) using the `redis-cli --cluster create` script.  
@@ -24,7 +24,7 @@ kubectl exec -it redis-cluster-0 -- redis-cli --cluster create --cluster-replica
 Or you can merge command like this  then copy ip result
 
 ```
-kubectl get pods -l app=redis-cluster -o jsonpath='{range.items[*]}{.status.podIP}:6379 '
+kubectl get pods -l name=redis-cluster -o jsonpath='{range.items[*]}{.status.podIP}:6379 '
 
 172.17.0.13:6379 172.17.0.14:6379 172.17.0.16:6379 172.17.0.18:6379 172.17.0.19:6379 172.17.0.21:6379
 ```
@@ -102,4 +102,58 @@ $ redis-benchmark -t set -c 100000 -n 100000 -h redis-cluster.redis-cluster.svc.
   3 bytes payload
   keep alive: 1
 14242.99 requests per second
+```
+
+
+## 6 master / 6 slave
+### GET
+```bash
+$ redis-benchmark -t get -c 10000 -n 100000 -h redis-cluster.redis-cluster.svc.cluster.local
+====== GET ======
+  100000 requests completed in 6.91 seconds
+  10000 parallel clients
+  3 bytes payload
+  keep alive: 1
+14461.32 requests per second
+```
+### SET
+```bash
+$ redis-benchmark -t set -c 10000 -n 100000 -h redis-cluster.redis-cluster.svc.cluster.local
+====== SET ======
+  100000 requests completed in 7.78 seconds
+  10000 parallel clients
+  3 bytes payload
+  keep alive: 1
+12846.87 requests per second
+```
+
+### GET
+```bash
+redis-benchmark -t get -c 100000 -n 100000 -h redis-cluster.redis-cluster.svc.cluster.local
+====== GET ======
+  100000 requests completed in 8.46 seconds
+  100000 parallel clients
+  3 bytes payload
+  keep alive: 1
+11816.14 requests per second
+```
+### SET
+```bash
+redis-benchmark -t set -c 100000 -n 100000 -h redis-cluster.redis-cluster.svc.cluster.local
+====== SET ======
+  100000 requests completed in 8.19 seconds
+  100000 parallel clients
+  3 bytes payload
+12204.05 requests per second
+```
+
+### GET
+```bash
+redis-benchmark -t get -c 200000 -n 200000 -h redis-cluster.redis-cluster.svc.cluster.local
+====== GET ======
+  200000 requests completed in 15.32 seconds
+  200000 parallel clients
+  3 bytes payload
+  keep alive: 1
+13057.39 requests per second
 ```
